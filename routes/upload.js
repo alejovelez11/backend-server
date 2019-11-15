@@ -119,7 +119,7 @@ function subirPorTipo(tipo, id, nombreArchivo, res) {
 
             usuario.save((err, usuarioActualizado) => {
 
-                // usuarioActualizado.password = ':)';
+                usuarioActualizado.password = ':)';
 
                 return res.status(200).json({
                     ok: true,
@@ -128,7 +128,10 @@ function subirPorTipo(tipo, id, nombreArchivo, res) {
                 });
 
             })
+
+
         });
+
     }
 
     if (tipo === 'medicos') {

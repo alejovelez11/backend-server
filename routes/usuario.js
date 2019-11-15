@@ -14,7 +14,7 @@ var Usuario = require("../models/usuario")
 app.get('/',(req, res, next) => {
     var desde = req.query.desde || 0
     desde = Number(desde)
-    Usuario.find({}, 'nombre correo img role') 
+    Usuario.find({}, 'nombre correo img role google') 
     .skip(desde) 
     .limit(5)
     .exec( 
@@ -45,16 +45,17 @@ app.get('/',(req, res, next) => {
 // Insertar usuarios
 // ============================
 
-app.post('/', mdAuth.verifyToken, (req, res) => {
+app.post('/', (req, res) => {
     var body = req.body;
+
     var usuario = new Usuario({
         nombre: body.nombre,
         correo: body.correo,
-        password: bcrypt.hashSync(body.password, 10),
+        password: body.password,
         img: body.img,
         role: body.role
-    })
-    usuario.save((err, usuarioSave)=>{
+    });
+    usuario.save((err, usuarioSave) => {
         if (err) {
             return res.status(400).json({
                 ok:false,
@@ -94,7 +95,7 @@ app.put("/:id", mdAuth.verifyToken,(req, res)=>{
             })
         }
         usuario.nombre = body.nombre
-        usuario.email = body.email
+        usuario.correo = body.correo
         usuario.role = body.role
 
         usuario.save((err, usuarioSave)=>{

@@ -9,35 +9,73 @@ var Medico = require("../models/medico")
 // Obtener todos los medicos
 // ============================
 
-app.get('/',(req, res, next) => {
-    var desde = req.query.desde || 0
-    desde = Number(desde)
+app.get('/', (req, res, next) => {
+
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
+
     Medico.find({})
-    .skip(desde) 
-    .limit(5)
-    .populate("usuario", "nombre correo")    
-    .populate("hospital")    
-    .exec(
-     (err, medicos) => {
-        if (err) {
-            return res.status(500).json({
-                ok:false,
-                mensaje:'Error al cargar medico',
-                errors:err
-            })
-        }
-        Medico.count({},(err, conteo)=>{
-            res.status(200).json({
-                ok:true,
-                total: conteo
-            })
-        })
-    })
-})
+        .skip(desde)
+        .limit(5)
+        .populate('usuario', 'nombre email')
+        .populate('hospital')
+        .exec(
+            (err, medicos) => {
+
+                if (err) {
+                    return res.status(500).json({
+                        ok: false,
+                        mensaje: 'Error cargando medico',
+                        errors: err
+                    });
+                }
+
+                Medico.count({}, (err, conteo) => {
+                    res.status(200).json({
+                        ok: true,
+                        medicos: medicos,
+                        total: conteo
+                    });
+
+                })
+
+            });
+});
+
 
 
 // ============================
-// Actualizar usuarios
+// Obtener medico
+// ============================
+app.get("/:id", (req, res)=>{
+    var id  = req.params.id
+    Medico.findById(id)
+    .populate("usuario", "nombre email img")
+    .populate("hospital")
+    .exec((err, medico)=>{
+             
+        if (err) {
+            return res.status(500).json({
+                ok:false,
+                mensaje:'Error al buscar el medico',
+                errors:err
+            })
+        }
+        if (!medico) {
+            return res.status(400).json({
+                ok:false,
+                mensaje:`El medico con el id ${id} no existe`,
+                errors: {message: 'No existe un usuario con ese ID'}
+            })
+        }
+        res.status(200).json({
+            ok:true,
+            medico:medico
+        })
+    })
+})
+// ============================
+// Actualizar medicos
 // ============================
 
 app.put("/:id", mdAuth.verifyToken,(req, res)=>{
